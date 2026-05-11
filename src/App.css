@@ -1167,6 +1167,217 @@
   opacity: 0.5;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 600px)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* ── Container: edge-to-edge on mobile ── */
+  .app-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 20px 16px;
+    gap: 16px;
+    min-height: 100vh;
+    box-shadow: none;
+  }
+
+  /* ── Header ── */
+  .app-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .app-title {
+    font-size: 1.2rem;
+  }
+
+  .app-user-bar {
+    gap: 8px;
+  }
+
+  .user-greeting {
+    font-size: 0.78rem;
+  }
+
+  .logout-btn {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    gap: 4px;
+  }
+
+  .logout-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ── Tab navigation ── */
+  .page-tabs {
+    gap: 3px;
+    padding: 3px;
+  }
+
+  .page-tab {
+    padding: 7px 8px;
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+
+  .page-tab svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* ── Todo form ── */
+  .todo-input {
+    font-size: 0.95rem;
+    padding: 11px 14px;
+  }
+
+  .todo-add-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* ── Todo items ── */
+  .todo-item {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .todo-text {
+    font-size: 0.9rem;
+  }
+
+  .todo-delete-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* ── Toolbar (count + icon buttons) ── */
+  .result-count {
+    font-size: 0.75rem;
+  }
+
+  .toolbar-icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .toolbar-icon-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ── Search input ── */
+  .search-input {
+    font-size: 0.85rem;
+    padding: 9px 32px 9px 34px;
+  }
+
+  /* ── Date filter: stack vertically ── */
+  .filter-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .date-filter-group {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .date-input {
+    font-size: 0.82rem;
+  }
+
+  /* ── Pagination: compact ── */
+  .pagination {
+    gap: 3px;
+  }
+
+  .page-btn {
+    padding: 5px 9px;
+    font-size: 0.8rem;
+    min-width: 32px;
+  }
+
+  /* ── Auth pages ── */
+  .auth-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 32px 20px;
+    min-height: 100vh;
+    box-shadow: none;
+  }
+
+  .auth-title {
+    font-size: 1.6rem;
+  }
+
+  /* ── Clip cards ── */
+  .clip-card-header {
+    padding: 10px 12px;
+  }
+
+  .clip-heading {
+    font-size: 0.85rem;
+  }
+
+  .clip-text-row {
+    padding: 7px 12px;
+    gap: 6px;
+  }
+
+  .clip-text-content {
+    font-size: 0.8rem;
+  }
+
+  .clip-add-text-input {
+    padding: 9px 12px;
+    font-size: 0.82rem;
+  }
+
+  .new-clip-btn {
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+
+  /* ── Splash screen ── */
+  .splash-screen {
+    min-height: 100vh;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — SMALL PHONES (≤ 360px)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 360px) {
+  .app-container {
+    padding: 16px 12px;
+  }
+
+  .app-title {
+    font-size: 1.1rem;
+  }
+
+  .page-tab {
+    font-size: 0.75rem;
+    padding: 6px 6px;
+  }
+
+  .todo-text {
+    font-size: 0.85rem;
+  }
+
+  .page-btn {
+    padding: 4px 7px;
+    font-size: 0.75rem;
+  }
+}
+
+
 
 
 

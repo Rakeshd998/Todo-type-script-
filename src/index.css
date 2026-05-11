@@ -29,7 +29,7 @@ body {
   min-height: 100vh; 
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;   /* allow scrolling on mobile */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -39,4 +39,19 @@ body {
   display: flex;
   justify-content: center;
   padding: 20px;
+  min-height: 100vh;
 }
+
+/* ── Mobile: remove padding, fill full screen ── */
+@media (max-width: 480px) {
+  body {
+    align-items: flex-start;
+    background-attachment: fixed;
+  }
+
+  #root {
+    padding: 0;
+    align-items: flex-start;
+  }
+}
+
