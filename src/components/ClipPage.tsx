@@ -4,6 +4,7 @@ import { useGetClipsQuery, useCreateClipMutation } from '../store/api/clipApi';
 import { useAppSelector } from '../store';
 import { useLogoutMutation } from '../store/api/authApi';
 import ClipCard from './ClipCard';
+import Footer from './Footer';
 
 const ClipPage = () => {
   const user = useAppSelector((s) => s.auth.user);
@@ -114,6 +115,7 @@ const ClipPage = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1130,5 +1130,43 @@
   cursor: not-allowed;
 }
 
+/* ── Footer ────────────────────────────────────────────────── */
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-top: 4px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.68rem;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.footer-link svg {
+  width: 11px;
+  height: 11px;
+}
+
+.footer-link:hover {
+  color: var(--primary);
+  opacity: 1;
+}
+
+.footer-dot {
+  opacity: 0.5;
+}
+
+
 
 

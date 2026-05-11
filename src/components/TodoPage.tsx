@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import TodoForm from './TodoFrorm';
 import TodoList from './TodoList';
+import Footer from './Footer';
 import { useAppSelector } from '../store';
 import { useLogoutMutation } from '../store/api/authApi';
 
@@ -46,6 +47,7 @@ const TodoPage = () => {
       {/* ── Todo content ── */}
       <TodoForm />
       <TodoList />
+      <Footer />
     </div>
   );
 };
