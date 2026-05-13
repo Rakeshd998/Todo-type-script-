@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import TodoForm from './TodoFrorm';
 import TodoList from './TodoList';
 import Footer from './Footer';
+import GripLogo from './GripLogo';
 import { useAppSelector } from '../store';
 import { useLogoutMutation } from '../store/api/authApi';
 import { useTheme } from '../hooks/useTheme';
@@ -15,7 +16,7 @@ const TodoPage = () => {
     <div className="app-container">
       {/* ── Header ── */}
       <div className="app-header">
-        <h1 className="app-title">Workspace</h1>
+        <GripLogo />
         <div className="app-user-bar">
           {user?.name && <span className="user-greeting">Hi, {user.name}</span>}
 

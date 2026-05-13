@@ -7,6 +7,8 @@ import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
   ApiResponse,
 } from '../../types/auth.types';
 
@@ -71,9 +73,34 @@ export const authApi = createApi({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setCredentials({user: data.data.user, accessToken: data.data.accessToken }));
+          dispatch(setCredentials({ user: data.data.user, accessToken: data.data.accessToken }));
         } catch {
           // Cookie expired / missing — clear everything including all caches.
+          dispatch(clearCredentials());
+          dispatch(todoApi.util.resetApiState());
+          dispatch(clipApi.util.resetApiState());
+        }
+      },
+    }),
+
+    forgotPassword: builder.mutation<ApiResponse, ForgotPasswordRequest>({
+      query: (body) => ({ url: '/auth/forgot-password', method: 'POST', body }),
+    }),
+
+    resetPassword: builder.mutation<ApiResponse, ResetPasswordRequest>({
+      query: ({ token, password }) => ({
+        url: `/auth/reset-password/${token}`,
+        method: 'POST',
+        body: { password },
+      }),
+    }),
+
+    deleteAccount: builder.mutation<ApiResponse, void>({
+      query: () => ({ url: '/auth/delete-account', method: 'DELETE' }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } finally {
           dispatch(clearCredentials());
           dispatch(todoApi.util.resetApiState());
           dispatch(clipApi.util.resetApiState());
@@ -88,4 +115,7 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useRefreshTokenMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useDeleteAccountMutation,
 } = authApi;

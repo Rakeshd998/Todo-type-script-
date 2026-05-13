@@ -26,8 +26,19 @@ const LoginPage = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-icon">✓</div>
-          <h1 className="auth-title">Welcome back</h1>
+          <div className="auth-logo-icon">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="login-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#06b6d4" />
+                </linearGradient>
+              </defs>
+              <circle cx="20" cy="20" r="17" stroke="url(#login-grad)" strokeWidth="3.5" fill="none" />
+              <path d="M28 16.5A10 10 0 1 0 30 22H22v-3h10v3a14 14 0 1 1-4-9.8" stroke="url(#login-grad)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </svg>
+          </div>
+          <h1 className="auth-title">Welcome to Grip</h1>
           <p className="auth-subtitle">Sign in to your account</p>
         </div>
 
@@ -51,7 +62,12 @@ const LoginPage = () => {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="login-password">Password</label>
+            <div className="form-label-row">
+              <label className="form-label" htmlFor="login-password">Password</label>
+              <Link className="forgot-password-link" to="/forgot-password">
+                Forgot password?
+              </Link>
+            </div>
             <input
               id="login-password"
               className="form-input"

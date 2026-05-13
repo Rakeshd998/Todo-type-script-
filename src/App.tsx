@@ -1,21 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TodoPage from './components/TodoPage';
 import ClipPage from './components/ClipPage';
 import ProfilePage from './components/ProfilePage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useRefreshTokenMutation } from './store/api/authApi';
 import { useAppSelector } from './store';
 
+// Routes that don't need a valid session — skip the refresh splash for these
+const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
+
 const App = () => {
   const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated);
+  const location = useLocation();
 
-  // If a token exists in localStorage, isAuthenticated is already true —
-  // no need to show a splash screen. Only show it for fresh (unauthenticated) sessions.
-  const [initialized, setInitialized] = useState(isAuthenticated);
+  // Skip the splash screen if we're already on a public route (e.g. /reset-password/:token).
+  // Otherwise, show it only for un-authenticated sessions while the refresh check runs.
+  const isPublicRoute = PUBLIC_ROUTES.some((r) => location.pathname.startsWith(r));
+  const [initialized, setInitialized] = useState(isAuthenticated || isPublicRoute);
 
   const [refreshToken] = useRefreshTokenMutation();
 
@@ -44,8 +51,8 @@ const App = () => {
       .finally(() => setInitialized(true));
   }, []);
 
-  // Show splash only for users with no stored session (first visit or after logout)
-  if (!initialized) {
+  // Show splash only for protected routes while refresh is in-flight
+  if (!initialized && !isPublicRoute) {
     return (
       <div className="splash-screen">
         <div className="splash-spinner" />
@@ -55,8 +62,10 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/login"    element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login"               element={<LoginPage />} />
+      <Route path="/register"            element={<RegisterPage />} />
+      <Route path="/forgot-password"     element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
       <Route path="/"       element={<ProtectedRoute><TodoPage /></ProtectedRoute>} />
       <Route path="/clips"  element={<ProtectedRoute><ClipPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

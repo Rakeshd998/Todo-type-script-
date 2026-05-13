@@ -6,6 +6,7 @@ import { useLogoutMutation } from '../store/api/authApi';
 import { useTheme } from '../hooks/useTheme';
 import ClipCard from './ClipCard';
 import Footer from './Footer';
+import GripLogo from './GripLogo';
 
 const ClipPage = () => {
   const user = useAppSelector((s) => s.auth.user);
@@ -30,7 +31,7 @@ const ClipPage = () => {
     <div className="app-container">
       {/* ── Header ── */}
       <div className="app-header">
-        <h1 className="app-title">Workspace</h1>
+        <GripLogo />
         <div className="app-user-bar">
           {user?.name && <span className="user-greeting">Hi, {user.name}</span>}
 

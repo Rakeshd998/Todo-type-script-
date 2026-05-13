@@ -27,3 +27,12 @@ export interface ApiResponse<T = undefined> {
   message: string;
   data: T;
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
