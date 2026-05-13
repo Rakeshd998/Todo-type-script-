@@ -5,6 +5,7 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TodoPage from './components/TodoPage';
 import ClipPage from './components/ClipPage';
+import ProfilePage from './components/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useRefreshTokenMutation } from './store/api/authApi';
 import { useAppSelector } from './store';
@@ -21,6 +22,13 @@ const App = () => {
   // Guard against React StrictMode's intentional double-mount in development,
   // which fires two simultaneous refresh requests causing a 403 on the second.
   const didInit = useRef(false);
+
+  // Apply saved theme on first render
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', saved ?? preferred);
+  }, []);
 
   useEffect(() => {
     if (didInit.current) return; // already called — skip StrictMode's second mount
@@ -49,9 +57,10 @@ const App = () => {
     <Routes>
       <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/" element={<ProtectedRoute><TodoPage /></ProtectedRoute>} />
-      <Route path="/clips" element={<ProtectedRoute><ClipPage /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/"       element={<ProtectedRoute><TodoPage /></ProtectedRoute>} />
+      <Route path="/clips"  element={<ProtectedRoute><ClipPage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="*"       element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

@@ -3,12 +3,14 @@ import { NavLink } from 'react-router-dom';
 import { useGetClipsQuery, useCreateClipMutation } from '../store/api/clipApi';
 import { useAppSelector } from '../store';
 import { useLogoutMutation } from '../store/api/authApi';
+import { useTheme } from '../hooks/useTheme';
 import ClipCard from './ClipCard';
 import Footer from './Footer';
 
 const ClipPage = () => {
   const user = useAppSelector((s) => s.auth.user);
   const [logout] = useLogoutMutation();
+  const { theme, toggleTheme } = useTheme();
 
   const { data: clips, isLoading, isError } = useGetClipsQuery();
   const [createClip, { isLoading: isCreating }] = useCreateClipMutation();
@@ -31,6 +33,33 @@ const ClipPage = () => {
         <h1 className="app-title">Workspace</h1>
         <div className="app-user-bar">
           {user?.name && <span className="user-greeting">Hi, {user.name}</span>}
+
+          {/* Theme toggle */}
+          <button
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            )}
+          </button>
+
           <button className="logout-btn" onClick={() => logout()} aria-label="Logout">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -56,6 +85,13 @@ const ClipPage = () => {
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
           Clipboard
+        </NavLink>
+        <NavLink to="/profile" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Profile
         </NavLink>
       </nav>
 
