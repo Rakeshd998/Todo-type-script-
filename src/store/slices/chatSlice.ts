@@ -117,7 +117,8 @@ const chatSlice = createSlice({
       .addCase(clearCredentials, () => initialState)
       // Seed unread badges from the server
       .addMatcher(chatApi.endpoints.getUnreadCounts.matchFulfilled, (state, action) => {
-        state.unreadCounts = action.payload;
+        // Guard: a null/malformed response must not crash every page's badge
+        state.unreadCounts = action.payload ?? {};
       });
   },
 });

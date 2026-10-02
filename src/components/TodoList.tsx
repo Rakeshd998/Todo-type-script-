@@ -30,18 +30,25 @@ const TodoList = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reset page when date filters change
-  useEffect(() => { setPage(1); }, [startDate, endDate]);
+  // Filter changes reset to page 1 in the same update (not in an effect), so the
+  // query never runs with the new filter against the old page number.
+  const changeStartDate = (value: string) => { setStartDate(value); setPage(1); };
+  const changeEndDate = (value: string) => { setEndDate(value); setPage(1); };
+  const clearDates = () => { setStartDate(''); setEndDate(''); setPage(1); };
 
-  // Clear search value when panel is closed
-  useEffect(() => {
-    if (!showSearch) { setSearch(''); }
-  }, [showSearch]);
+  // Closing a panel also clears its filter
+  const toggleSearch = () => {
+    if (showSearch) {
+      setSearch('');
+      if (debouncedSearch) { setDebouncedSearch(''); setPage(1); }
+    }
+    setShowSearch(!showSearch);
+  };
 
-  // Clear date values when panel is closed
-  useEffect(() => {
-    if (!showDateFilter) { setStartDate(''); setEndDate(''); }
-  }, [showDateFilter]);
+  const toggleDateFilter = () => {
+    if (showDateFilter && (startDate || endDate)) clearDates();
+    setShowDateFilter(!showDateFilter);
+  };
 
   const queryParams = {
     page,
@@ -53,10 +60,13 @@ const TodoList = () => {
 
   const { data, isLoading, isError, isFetching } = useGetTodosQuery(queryParams);
 
-  // If deleting the last item on a page causes empty results, go back one page
-  useEffect(() => {
-    if (data && data.todos.length === 0 && page > 1) setPage((p) => p - 1);
-  }, [data, page]);
+  // If deleting the last item on a page leaves it empty, move to the last page that
+  // still has items. Adjusting state during render (rather than in an effect) avoids
+  // an extra render; `data.page === page` ensures we only act on this page's result
+  // (RTK Query keeps showing the previous page's data while the next one loads).
+  if (data && data.page === page && data.todos.length === 0 && page > 1) {
+    setPage(Math.max(1, data.totalPages));
+  }
 
   const hasDateFilter = startDate || endDate;
   const isSearchActive = showSearch || !!debouncedSearch;
@@ -80,7 +90,7 @@ const TodoList = () => {
           {/* Search icon toggle */}
           <button
             className={`toolbar-icon-btn ${isSearchActive ? 'toolbar-icon-btn--active' : ''}`}
-            onClick={() => setShowSearch((s) => !s)}
+            onClick={toggleSearch}
             title="Search todos"
             aria-label="Toggle search"
           >
@@ -93,7 +103,7 @@ const TodoList = () => {
           {/* Calendar / date filter icon toggle */}
           <button
             className={`toolbar-icon-btn ${isDateActive ? 'toolbar-icon-btn--active' : ''}`}
-            onClick={() => setShowDateFilter((d) => !d)}
+            onClick={toggleDateFilter}
             title="Filter by date"
             aria-label="Toggle date filter"
           >
@@ -137,7 +147,7 @@ const TodoList = () => {
               className="date-input"
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => changeStartDate(e.target.value)}
               max={endDate || undefined}
             />
           </div>
@@ -147,12 +157,12 @@ const TodoList = () => {
               className="date-input"
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => changeEndDate(e.target.value)}
               min={startDate || undefined}
             />
           </div>
           {hasDateFilter && (
-            <button className="clear-filter-btn" onClick={() => { setStartDate(''); setEndDate(''); }}>
+            <button className="clear-filter-btn" onClick={clearDates}>
               Clear
             </button>
           )}

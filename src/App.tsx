@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
-import './styles/glass.css'; // after App.css so glass overrides win at equal specificity
+// After App.css so style/layout overrides win at equal specificity
+import './styles/layouts.css';
+import './styles/glass.css';
+import './styles/tactile.css';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TodoPage from './components/TodoPage';
@@ -43,7 +46,7 @@ const App = () => {
       .unwrap()
       .catch(() => {})
       .finally(() => setInitialized(true));
-  }, []);
+  }, [refreshToken]); // stable trigger; didInit keeps this to a single run
 
   // The free backend sleeps when idle and can take ~a minute to wake —
   // tell the user instead of showing a silent spinner

@@ -1,0 +1,365 @@
+/* ══════════════════════════════════════════════════════════════
+   TACTILE STYLE — Tactile Brutalism × Neo-Minimalism
+   Activated by <html data-style="tactile">; works with data-theme light/dark.
+
+   Neo-minimal: warm paper, generous space, monochrome ink, one bold accent,
+                grotesk type with mono labels.
+   Tactile brutal: thick ink borders, hard offset shadows (no blur), buttons
+                that physically press in.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tokens: light ── */
+[data-style="tactile"] {
+  --tac-paper: #f2efe6;
+  --tac-dot: rgba(17, 17, 17, 0.1);
+  --tac-ink: #111111;            /* borders + shadows */
+  --tac-accent: #ff6a2b;         /* bold fill colour */
+  --tac-on-accent: #111111;      /* text on accent fills */
+  --tac-on-ink: #f8f6f0;         /* text on ink fills */
+  --tac-shadow-sm: 3px 3px 0 var(--tac-ink);
+  --tac-shadow-md: 5px 5px 0 var(--tac-ink);
+  --tac-shadow-lg: 8px 8px 0 var(--tac-ink);
+  --tac-radius: 6px;
+  --tac-radius-sm: 4px;
+  --tac-font: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --tac-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Re-pointed base tokens */
+  --primary: #c2410c;            /* text-safe accent (≥ 4.5:1 on paper) */
+  --primary-hover: #9a3412;
+  --bg-color: var(--tac-paper);
+  --container-bg: #fdfcf8;
+  --container-border: var(--tac-ink);
+  --text-main: #111111;
+  --text-muted: #5b5850;
+  --input-bg: #f7f5ef;
+  --input-border: var(--tac-ink);
+  --danger: #dc2626;
+  --todo-item-bg: #ffffff;
+  --tab-active-bg: var(--tac-ink);
+  --theme-toggle-bg: #ffffff;
+  --profile-avatar-bg: var(--tac-accent);
+  --body-gradient:
+    radial-gradient(var(--tac-dot) 1px, transparent 1.2px) 0 0 / 22px 22px,
+    var(--tac-paper);
+}
+
+/* ── Tokens: dark ── */
+[data-style="tactile"][data-theme="dark"] {
+  --tac-paper: #131313;
+  --tac-dot: rgba(255, 255, 255, 0.07);
+  --tac-ink: #ece7da;
+  --tac-accent: #ff6a2b;
+  --tac-on-accent: #111111;
+  --tac-on-ink: #131313;
+
+  --primary: #ff8a57;
+  --primary-hover: #ffa47c;
+  --container-bg: #1b1b1b;
+  --text-main: #f4f0e6;
+  --text-muted: #a8a397;
+  --input-bg: #171717;
+  --todo-item-bg: #222222;
+  --theme-toggle-bg: #222222;
+  --danger: #f87171;
+}
+
+/* ── Base type & background ── */
+[data-style="tactile"] body {
+  font-family: var(--tac-font);
+  background: var(--body-gradient);
+  background-attachment: fixed;
+}
+
+[data-style="tactile"] button,
+[data-style="tactile"] input,
+[data-style="tactile"] textarea {
+  font-family: inherit;
+}
+
+/* Mono, uppercase micro-labels — the neo-minimal voice */
+[data-style="tactile"] :is(
+  .form-label, .result-count, .todo-meta, .profile-section-title, .appearance-label,
+  .profile-field-label, .profile-badge, .date-label, .app-footer, .chat-bubble-time,
+  .chat-header-status, .page-btn, .user-greeting
+) {
+  font-family: var(--tac-mono);
+  letter-spacing: 0.04em;
+}
+
+[data-style="tactile"] :is(.form-label, .profile-section-title, .appearance-label, .profile-field-label) {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+[data-style="tactile"] :is(.auth-title, .profile-name, .chat-sidebar-title, .modal-title) {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Logo: solid ink instead of gradient text */
+[data-style="tactile"] .grip-logo-text {
+  background: none;
+  -webkit-text-fill-color: var(--text-main);
+  color: var(--text-main);
+  letter-spacing: -0.03em;
+}
+
+[data-style="tactile"] .grip-logo-icon {
+  filter: none;
+}
+
+/* ── Slabs: main surfaces ── */
+[data-style="tactile"] :is(.app-container, .auth-card, .modal-card) {
+  border: 2.5px solid var(--tac-ink);
+  border-radius: var(--tac-radius);
+  box-shadow: var(--tac-shadow-lg);
+}
+
+@media (min-width: 601px) {
+  [data-style="tactile"] .app-container {
+    padding: 40px;
+    gap: 24px;
+  }
+}
+
+[data-style="tactile"] :is(
+  .todo-item, .clip-card, .profile-hero, .profile-fields, .chat-layout, .new-clip-form,
+  .style-option, .page-tabs, .mode-switch
+) {
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius);
+}
+
+[data-style="tactile"] :is(.todo-item, .clip-card, .profile-hero, .chat-layout) {
+  box-shadow: var(--tac-shadow-md);
+}
+
+[data-style="tactile"] :is(.todo-item, .clip-card):hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 var(--tac-ink);
+}
+
+/* Completed todo: sits flat on the page (no raised shadow) */
+[data-style="tactile"] .todo-item.completed,
+[data-style="tactile"] .todo-item.completed:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+/* Square ink checkbox */
+[data-style="tactile"] .todo-checkbox {
+  border: 2px solid var(--tac-ink);
+  border-radius: 3px;
+}
+
+[data-style="tactile"] .todo-item.completed .todo-checkbox {
+  background: var(--tac-ink);
+  border-color: var(--tac-ink);
+}
+
+/* Tick must contrast with the ink fill in both modes (base CSS hard-codes white) */
+[data-style="tactile"] .todo-checkbox svg {
+  stroke: var(--tac-on-ink);
+}
+
+/* ── Inputs ── */
+[data-style="tactile"] :is(
+  .todo-input, .form-input, .search-input, .chat-input, .chat-search-input,
+  .date-input, .clip-heading-input, .clip-add-text-input, .todo-edit-input
+) {
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius-sm);
+}
+
+[data-style="tactile"] :is(
+  .todo-input, .form-input, .search-input, .chat-input, .chat-search-input,
+  .date-input, .clip-heading-input, .clip-add-text-input, .todo-edit-input
+):focus {
+  border-color: var(--tac-ink);
+  background: var(--todo-item-bg);
+  box-shadow: 3px 3px 0 var(--tac-accent);
+  outline: none;
+}
+
+/* ── Tactile buttons: raised, lift on hover, press on click ── */
+[data-style="tactile"] :is(
+  .todo-add-btn, .auth-submit-btn, .new-clip-btn, .chat-send-btn, .danger-btn,
+  .logout-btn, .theme-toggle-btn, .toolbar-icon-btn, .modal-cancel-btn,
+  .new-clip-cancel-btn, .page-btn, .clip-action-btn, .clip-copy-btn
+) {
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius-sm);
+  box-shadow: var(--tac-shadow-sm);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+}
+
+[data-style="tactile"] :is(
+  .todo-add-btn, .auth-submit-btn, .new-clip-btn, .chat-send-btn, .danger-btn,
+  .logout-btn, .theme-toggle-btn, .toolbar-icon-btn, .modal-cancel-btn,
+  .new-clip-cancel-btn, .page-btn, .clip-action-btn, .clip-copy-btn
+):hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--tac-ink);
+}
+
+[data-style="tactile"] :is(
+  .todo-add-btn, .auth-submit-btn, .new-clip-btn, .chat-send-btn, .danger-btn,
+  .logout-btn, .theme-toggle-btn, .toolbar-icon-btn, .modal-cancel-btn,
+  .new-clip-cancel-btn, .page-btn, .clip-action-btn, .clip-copy-btn
+):active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--tac-ink);
+}
+
+[data-style="tactile"] :is(
+  .todo-add-btn, .auth-submit-btn, .new-clip-btn, .chat-send-btn, .danger-btn,
+  .modal-cancel-btn, .page-btn
+):disabled {
+  box-shadow: none;
+  transform: translate(3px, 3px);
+}
+
+/* Accent fills — ink text on orange */
+[data-style="tactile"] :is(
+  .todo-add-btn, .auth-submit-btn:not(.auth-submit-btn--outline), .new-clip-btn,
+  .chat-send-btn, .page-btn.active, .unread-badge
+),
+[data-style="tactile"] :is(
+  .todo-add-btn, .auth-submit-btn:not(.auth-submit-btn--outline), .new-clip-btn, .chat-send-btn
+):hover:not(:disabled) {
+  background: var(--tac-accent);
+  color: var(--tac-on-accent);
+}
+
+[data-style="tactile"] .unread-badge {
+  border: 1.5px solid var(--tac-ink);
+  font-family: var(--tac-mono);
+}
+
+/* Neutral buttons on paper */
+[data-style="tactile"] :is(.logout-btn, .theme-toggle-btn, .toolbar-icon-btn, .modal-cancel-btn, .new-clip-cancel-btn) {
+  background: var(--todo-item-bg);
+  color: var(--text-main);
+}
+
+/* ── Tabs: ink slab for the active page ── */
+[data-style="tactile"] .page-tabs {
+  background: var(--todo-item-bg);
+  box-shadow: var(--tac-shadow-sm);
+}
+
+[data-style="tactile"] .page-tab {
+  border-radius: var(--tac-radius-sm);
+  color: var(--text-main);
+}
+
+[data-style="tactile"] .page-tab:hover {
+  background: var(--input-bg);
+}
+
+[data-style="tactile"] .page-tab--active,
+[data-style="tactile"] .page-tab--active:hover {
+  background: var(--tac-ink);
+  color: var(--tac-on-ink);
+  box-shadow: none;
+}
+
+/* ── Profile ── */
+[data-style="tactile"] .profile-avatar {
+  border: 2.5px solid var(--tac-ink);
+  color: var(--tac-on-accent);
+  box-shadow: var(--tac-shadow-sm);
+}
+
+[data-style="tactile"] .profile-badge {
+  background: transparent;
+  border: 1.5px solid var(--tac-ink);
+  color: var(--text-main);
+  border-radius: var(--tac-radius-sm);
+}
+
+[data-style="tactile"] .profile-field {
+  border-bottom-width: 2px;
+}
+
+/* ── Chat ── */
+[data-style="tactile"] :is(.chat-sidebar) {
+  border-right: 2px solid var(--tac-ink);
+}
+
+[data-style="tactile"] :is(.chat-header) {
+  border-bottom: 2px solid var(--tac-ink);
+}
+
+[data-style="tactile"] :is(.chat-input-area) {
+  border-top: 2px solid var(--tac-ink);
+}
+
+[data-style="tactile"] .chat-bubble {
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius);
+  box-shadow: var(--tac-shadow-sm);
+}
+
+[data-style="tactile"] .chat-bubble--mine {
+  background: var(--tac-accent);
+  color: var(--tac-on-accent);
+}
+
+[data-style="tactile"] .chat-bubble--theirs {
+  background: var(--todo-item-bg);
+}
+
+[data-style="tactile"] .chat-user-item--active {
+  background: var(--input-bg);
+  box-shadow: inset 4px 0 0 var(--tac-accent);
+}
+
+/* ── Overlays & selection ── */
+[data-style="tactile"] .modal-overlay {
+  background: rgba(17, 17, 17, 0.45);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-style="tactile"] ::selection {
+  background: var(--tac-accent);
+  color: var(--tac-on-accent);
+}
+
+/* Appearance picker: active card gets an accent offset shadow */
+[data-style="tactile"] .style-option--active,
+[data-style="tactile"] .style-option--active:hover {
+  border-color: var(--tac-ink);
+  box-shadow: 4px 4px 0 var(--tac-accent);
+}
+
+[data-style="tactile"] .style-option-check {
+  background: var(--tac-accent);
+  color: var(--tac-on-accent);
+  border: 2px solid var(--tac-ink);
+}
+
+[data-style="tactile"] .mode-switch-option--active {
+  background: var(--tac-ink);
+  color: var(--tac-on-ink);
+  box-shadow: none;
+}
+
+/* ── Motion: respect reduced-motion users ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-style="tactile"] * {
+    transition-duration: 0s !important;
+  }
+}
+
+/* ── Mobile: edge-to-edge container, keep the borders crisp ── */
+@media (max-width: 600px) {
+  [data-style="tactile"] .app-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,85 @@
+/* ══════════════════════════════════════════════════════════════
+   LAYOUTS — <html data-layout="focused | wide | sidebar">
+   AppShell renders: .app-header, .page-tabs, .page-content, .app-footer
+   inside .app-container. Layouts only rearrange those four regions.
+   Below the breakpoints every layout falls back to the focused column.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Content region: keeps the container's spacing between page sections */
+.page-content {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+}
+
+/* ── Wide: roomier single column, clips in a grid ── */
+@media (min-width: 760px) {
+  [data-layout="wide"] .app-container {
+    max-width: 1040px;
+  }
+
+  [data-layout="wide"] .clip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-items: start;
+  }
+}
+
+/* ── Sidebar: vertical navigation beside the content ── */
+@media (min-width: 900px) {
+  [data-layout="sidebar"] .app-container {
+    max-width: 1120px;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    /* Content row absorbs spare height so header/footer don't drift apart */
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header header"
+      "nav    content"
+      "footer footer";
+    align-items: start;
+    column-gap: 32px;
+  }
+
+  [data-layout="sidebar"] .app-header  { grid-area: header; }
+  [data-layout="sidebar"] .page-content { grid-area: content; }
+  [data-layout="sidebar"] .app-footer  { grid-area: footer; }
+
+  [data-layout="sidebar"] .page-tabs {
+    grid-area: nav;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    position: sticky;
+    top: 20px;
+  }
+
+  [data-layout="sidebar"] .page-tab {
+    flex: none;
+    justify-content: flex-start;
+    padding: 11px 14px;
+    font-size: 0.9rem;
+  }
+
+  [data-layout="sidebar"] .page-tab svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Chat tab: badge pushed to the right edge of the row */
+  [data-layout="sidebar"] .chat-tab-inner {
+    flex: 1;
+    justify-content: flex-start;
+  }
+
+  [data-layout="sidebar"] .chat-tab-inner .unread-badge {
+    margin-left: auto;
+  }
+
+  [data-layout="sidebar"] .clip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    align-items: start;
+  }
+}

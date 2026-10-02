@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { HashRouter } from 'react-router-dom';
 import { store } from './store';
+import { AppearanceProvider } from './context/AppearanceProvider';
 import './index.css';
 import App from './App.tsx';
 
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')!).render(
         BrowserRouter caused 404s because GitHub Pages has no fallback route.
       */}
       <HashRouter>
-        <App />
+        <AppearanceProvider>
+          <App />
+        </AppearanceProvider>
       </HashRouter>
     </Provider>
   </StrictMode>,

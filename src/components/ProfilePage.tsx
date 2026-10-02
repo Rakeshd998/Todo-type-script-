@@ -1,20 +1,14 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../store';
-import { useLogoutMutation, useDeleteAccountMutation } from '../store/api/authApi';
-import { useTheme } from '../hooks/useTheme';
-import Footer from './Footer';
-import GripLogo from './GripLogo';
+import { useDeleteAccountMutation } from '../store/api/authApi';
+import AppShell from './AppShell';
 import AppearanceSettings from './AppearanceSettings';
 
 const ProfilePage = () => {
   const user = useAppSelector((s) => s.auth.user);
-  const unreadCounts = useAppSelector((s) => s.chat.unreadCounts);
-  const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
   const navigate = useNavigate();
-  const [logout] = useLogoutMutation();
   const [deleteAccount, { isLoading: isDeleting }] = useDeleteAccountMutation();
-  const { theme, setTheme, toggleTheme, uiStyle, setUiStyle } = useTheme();
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -50,81 +44,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="app-container">
-      {/* ── Header ── */}
-      <div className="app-header">
-        <GripLogo />
-        <div className="app-user-bar">
-          <button
-            className="theme-toggle-btn"
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {theme === 'light' ? (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            )}
-          </button>
-
-          <button className="logout-btn" onClick={() => logout()} aria-label="Logout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            Logout
-          </button>
-        </div>
-      </div>
-
-      {/* ── Tab Navigation ── */}
-      <nav className="page-tabs">
-        <NavLink to="/" end className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-          </svg>
-          Todos
-        </NavLink>
-        <NavLink to="/clips" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
-          Clipboard
-        </NavLink>
-        <NavLink to="/chat" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
-          <span className="chat-tab-inner">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            Chat
-            {totalUnread > 0 && (
-              <span className="unread-badge">{totalUnread > 99 ? '99+' : totalUnread}</span>
-            )}
-          </span>
-        </NavLink>
-        <NavLink to="/profile" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          Profile
-        </NavLink>
-      </nav>
+    <AppShell>
 
       {/* ── Profile Content ── */}
       <div className="profile-page">
@@ -160,12 +80,7 @@ const ProfilePage = () => {
         {/* Preferences */}
         <div className="profile-section">
           <h3 className="profile-section-title">Appearance</h3>
-          <AppearanceSettings
-            theme={theme}
-            setTheme={setTheme}
-            uiStyle={uiStyle}
-            setUiStyle={setUiStyle}
-          />
+          <AppearanceSettings />
         </div>
 
         {/* ── Danger Zone ── */}
@@ -191,7 +106,6 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      <Footer />
 
       {/* ── Delete Confirmation Modal ── */}
       {showDeleteModal && (
@@ -240,7 +154,7 @@ const ProfilePage = () => {
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 };
 
