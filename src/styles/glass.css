@@ -1,0 +1,257 @@
+/* ══════════════════════════════════════════════════════════════
+   GLASS STYLE — frosted, translucent surfaces over a soft gradient
+   Activated by <html data-style="glass">; works with data-theme light/dark.
+   Mostly re-points the design tokens from index.css, then adds blur,
+   highlights and gradients to the main surfaces.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Tokens: light ── */
+[data-style="glass"] {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-color: transparent;
+  --container-bg: rgba(255, 255, 255, 0.42);
+  --container-border: rgba(255, 255, 255, 0.65);
+  --text-main: #1e1b4b;
+  --text-muted: #4c4f7a;
+  --input-bg: rgba(255, 255, 255, 0.45);
+  --input-border: rgba(255, 255, 255, 0.8);
+  --todo-item-bg: rgba(255, 255, 255, 0.4);
+  --tab-active-bg: rgba(255, 255, 255, 0.85);
+  --theme-toggle-bg: rgba(255, 255, 255, 0.35);
+
+  /* glass-only tokens */
+  --glass-inner-bg: rgba(255, 255, 255, 0.2);
+  --glass-focus-bg: rgba(255, 255, 255, 0.8);
+  --glass-blur: blur(22px) saturate(170%);
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --glass-accent: linear-gradient(135deg, #6366f1 0%, #a855f7 55%, #ec4899 100%);
+  --glass-accent-glow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  --glass-active-tint: rgba(99, 102, 241, 0.14);
+  --glass-blob-1: #a5b4fc;
+  --glass-blob-2: #f9a8d4;
+  --glass-blob-3: #67e8f9;
+  --glass-blob-opacity: 0.75;
+  --body-gradient:
+    radial-gradient(at 12% 18%, #c7d2fe 0, transparent 50%),
+    radial-gradient(at 88% 12%, #fbcfe8 0, transparent 45%),
+    radial-gradient(at 82% 88%, #a5f3fc 0, transparent 50%),
+    radial-gradient(at 8% 92%, #ddd6fe 0, transparent 50%),
+    linear-gradient(135deg, #eef2ff 0%, #fdf2f8 100%);
+}
+
+/* ── Tokens: dark ── */
+[data-style="glass"][data-theme="dark"] {
+  --primary: #818cf8;
+  --primary-hover: #6366f1;
+  --container-bg: rgba(17, 20, 42, 0.5);
+  --container-border: rgba(255, 255, 255, 0.12);
+  --text-main: #f1f3ff;
+  --text-muted: #a9b0d6;
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.14);
+  --todo-item-bg: rgba(255, 255, 255, 0.05);
+  --tab-active-bg: rgba(255, 255, 255, 0.14);
+  --theme-toggle-bg: rgba(255, 255, 255, 0.06);
+
+  --glass-inner-bg: rgba(255, 255, 255, 0.03);
+  --glass-focus-bg: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --glass-accent: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #d946ef 100%);
+  --glass-accent-glow: 0 6px 22px rgba(129, 140, 248, 0.35);
+  --glass-active-tint: rgba(129, 140, 248, 0.18);
+  --glass-blob-1: #4f46e5;
+  --glass-blob-2: #db2777;
+  --glass-blob-3: #0d9488;
+  --glass-blob-opacity: 0.45;
+  --body-gradient:
+    radial-gradient(at 12% 15%, rgba(99, 102, 241, 0.45) 0, transparent 45%),
+    radial-gradient(at 88% 18%, rgba(236, 72, 153, 0.3) 0, transparent 45%),
+    radial-gradient(at 78% 90%, rgba(20, 184, 166, 0.3) 0, transparent 50%),
+    linear-gradient(135deg, #0a0c1d 0%, #140f2e 100%);
+}
+
+/* ── Background: fixed gradient + slowly drifting colour blobs ── */
+[data-style="glass"] body {
+  background: var(--body-gradient);
+  background-attachment: fixed;
+}
+
+[data-style="glass"] body::before,
+[data-style="glass"] body::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  width: 42vmax;
+  height: 42vmax;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: var(--glass-blob-opacity);
+  pointer-events: none;
+  animation: glass-drift 26s ease-in-out infinite alternate;
+}
+
+[data-style="glass"] body::before {
+  top: -12vmax;
+  left: -10vmax;
+  background: radial-gradient(circle, var(--glass-blob-1), var(--glass-blob-2) 70%);
+}
+
+[data-style="glass"] body::after {
+  bottom: -14vmax;
+  right: -10vmax;
+  background: radial-gradient(circle, var(--glass-blob-3), var(--glass-blob-1) 70%);
+  animation-delay: -13s;
+}
+
+@keyframes glass-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(8vmax, 6vmax) scale(1.08); }
+  100% { transform: translate(-4vmax, 10vmax) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-style="glass"] body::before,
+  [data-style="glass"] body::after {
+    animation: none;
+  }
+}
+
+/* ── Frosted surfaces ── */
+[data-style="glass"] .app-container,
+[data-style="glass"] .auth-card,
+[data-style="glass"] .modal-card {
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  border-radius: 24px;
+}
+
+/* Nested panels: lighter tint so stacked layers don't turn opaque */
+[data-style="glass"] .chat-layout,
+[data-style="glass"] .chat-main {
+  background: var(--glass-inner-bg);
+}
+
+[data-style="glass"] .chat-layout,
+[data-style="glass"] .clip-card,
+[data-style="glass"] .profile-hero,
+[data-style="glass"] .new-clip-form {
+  border-radius: 18px;
+}
+
+[data-style="glass"] .todo-item,
+[data-style="glass"] .clip-card,
+[data-style="glass"] .profile-hero {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+[data-style="glass"][data-theme="dark"] .todo-item,
+[data-style="glass"][data-theme="dark"] .clip-card,
+[data-style="glass"][data-theme="dark"] .profile-hero {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-style="glass"] .todo-item:hover,
+[data-style="glass"] .clip-card:hover {
+  background: var(--input-bg);
+}
+
+/* ── Inputs: replace the opaque white focus state ── */
+[data-style="glass"] .todo-input:focus,
+[data-style="glass"] .form-input:focus,
+[data-style="glass"] .search-input:focus,
+[data-style="glass"] .chat-search-input:focus,
+[data-style="glass"] .chat-input:focus,
+[data-style="glass"] .clip-heading-input {
+  background: var(--glass-focus-bg);
+}
+
+[data-style="glass"] .chat-input {
+  background: var(--input-bg);
+}
+
+/* ── Tabs: frosted pill ── */
+[data-style="glass"] .page-tabs {
+  border-radius: 14px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+[data-style="glass"] .page-tab {
+  border-radius: 10px;
+}
+
+[data-style="glass"] .page-tab--active {
+  box-shadow: 0 4px 14px rgba(31, 38, 135, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+[data-style="glass"][data-theme="dark"] .page-tab--active {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ── Primary actions: gradient accent with soft glow ── */
+[data-style="glass"] .todo-add-btn,
+[data-style="glass"] .auth-submit-btn:not(.auth-submit-btn--outline),
+[data-style="glass"] .new-clip-btn,
+[data-style="glass"] .chat-send-btn,
+[data-style="glass"] .unread-badge {
+  background: var(--glass-accent);
+  border-color: transparent;
+}
+
+[data-style="glass"] .todo-add-btn,
+[data-style="glass"] .auth-submit-btn:not(.auth-submit-btn--outline),
+[data-style="glass"] .new-clip-btn,
+[data-style="glass"] .chat-send-btn {
+  box-shadow: var(--glass-accent-glow);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+[data-style="glass"] .todo-add-btn:hover:not(:disabled),
+[data-style="glass"] .auth-submit-btn:not(.auth-submit-btn--outline):hover:not(:disabled),
+[data-style="glass"] .new-clip-btn:hover:not(:disabled),
+[data-style="glass"] .chat-send-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* ── Chat ── */
+[data-style="glass"] .chat-bubble--mine {
+  background: var(--glass-accent);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+
+[data-style="glass"] .chat-bubble--theirs {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+[data-style="glass"] .chat-user-item--active {
+  background: var(--glass-active-tint);
+}
+
+/* ── Overlays ── */
+[data-style="glass"] .modal-overlay {
+  background: rgba(15, 12, 41, 0.3);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* ── Fallback: browsers without backdrop-filter get more opaque panels ── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-style="glass"] {
+    --container-bg: rgba(255, 255, 255, 0.88);
+  }
+  [data-style="glass"][data-theme="dark"] {
+    --container-bg: rgba(17, 20, 42, 0.92);
+  }
+}
+
+/* ── Mobile: container is edge-to-edge, so drop the rounded corners ── */
+@media (max-width: 600px) {
+  [data-style="glass"] .app-container {
+    border-radius: 0;
+    box-shadow: none;
+  }
+}

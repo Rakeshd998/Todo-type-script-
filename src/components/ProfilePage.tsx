@@ -5,13 +5,16 @@ import { useLogoutMutation, useDeleteAccountMutation } from '../store/api/authAp
 import { useTheme } from '../hooks/useTheme';
 import Footer from './Footer';
 import GripLogo from './GripLogo';
+import AppearanceSettings from './AppearanceSettings';
 
 const ProfilePage = () => {
   const user = useAppSelector((s) => s.auth.user);
+  const unreadCounts = useAppSelector((s) => s.chat.unreadCounts);
+  const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
   const navigate = useNavigate();
   const [logout] = useLogoutMutation();
   const [deleteAccount, { isLoading: isDeleting }] = useDeleteAccountMutation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme, toggleTheme, uiStyle, setUiStyle } = useTheme();
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -103,6 +106,17 @@ const ProfilePage = () => {
           </svg>
           Clipboard
         </NavLink>
+        <NavLink to="/chat" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
+          <span className="chat-tab-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            Chat
+            {totalUnread > 0 && (
+              <span className="unread-badge">{totalUnread > 99 ? '99+' : totalUnread}</span>
+            )}
+          </span>
+        </NavLink>
         <NavLink to="/profile" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -145,15 +159,13 @@ const ProfilePage = () => {
 
         {/* Preferences */}
         <div className="profile-section">
-          <h3 className="profile-section-title">Preferences</h3>
-          <p className="profile-coming-soon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            More settings coming soon…
-          </p>
+          <h3 className="profile-section-title">Appearance</h3>
+          <AppearanceSettings
+            theme={theme}
+            setTheme={setTheme}
+            uiStyle={uiStyle}
+            setUiStyle={setUiStyle}
+          />
         </div>
 
         {/* ── Danger Zone ── */}

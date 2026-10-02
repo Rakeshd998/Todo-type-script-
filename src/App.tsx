@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
+import './styles/glass.css'; // after App.css so glass overrides win at equal specificity
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import TodoPage from './components/TodoPage';
@@ -33,13 +34,6 @@ const App = () => {
 
   // Seed unread chat badges (shown on every page's Chat tab) from the server
   useGetUnreadCountsQuery(undefined, { skip: !isAuthenticated });
-
-  // Apply saved theme on first render
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', saved ?? preferred);
-  }, []);
 
   useEffect(() => {
     if (didInit.current) return;
