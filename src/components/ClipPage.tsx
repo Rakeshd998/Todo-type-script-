@@ -10,6 +10,8 @@ import GripLogo from './GripLogo';
 
 const ClipPage = () => {
   const user = useAppSelector((s) => s.auth.user);
+  const unreadCounts = useAppSelector((s) => s.chat.unreadCounts);
+  const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
   const [logout] = useLogoutMutation();
   const { theme, toggleTheme } = useTheme();
 
@@ -86,6 +88,17 @@ const ClipPage = () => {
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
           Clipboard
+        </NavLink>
+        <NavLink to="/chat" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
+          <span className="chat-tab-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            Chat
+            {totalUnread > 0 && (
+              <span className="unread-badge">{totalUnread > 99 ? '99+' : totalUnread}</span>
+            )}
+          </span>
         </NavLink>
         <NavLink to="/profile" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -9,6 +9,8 @@ import { useTheme } from '../hooks/useTheme';
 
 const TodoPage = () => {
   const user = useAppSelector((s) => s.auth.user);
+  const unreadCounts = useAppSelector((s) => s.chat.unreadCounts);
+  const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
   const [logout] = useLogoutMutation();
   const { theme, toggleTheme } = useTheme();
 
@@ -74,10 +76,21 @@ const TodoPage = () => {
           </svg>
           Clipboard
         </NavLink>
+        <NavLink to="/chat" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
+          <span className="chat-tab-inner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            Chat
+            {totalUnread > 0 && (
+              <span className="unread-badge">{totalUnread > 99 ? '99+' : totalUnread}</span>
+            )}
+          </span>
+        </NavLink>
         <NavLink to="/profile" className={({ isActive }) => `page-tab ${isActive ? 'page-tab--active' : ''}`}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
           Profile
         </NavLink>

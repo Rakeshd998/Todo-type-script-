@@ -3,6 +3,7 @@ import { baseQueryWithReauth } from './baseQuery';
 import { setCredentials, clearCredentials } from '../slices/authSlice';
 import { todoApi } from './todoApi';
 import { clipApi } from './clipApi';
+import { chatApi } from './chatApi';
 import type {
   AuthResponse,
   LoginRequest,
@@ -63,6 +64,7 @@ export const authApi = createApi({
           dispatch(clearCredentials());
           dispatch(todoApi.util.resetApiState());
           dispatch(clipApi.util.resetApiState());
+          dispatch(chatApi.util.resetApiState());
         }
       },
     }),
@@ -70,15 +72,19 @@ export const authApi = createApi({
     // Called on app start to restore session from HttpOnly refresh cookie
     refreshToken: builder.mutation<ApiResponse<AuthResponse>, void>({
       query: () => ({ url: '/auth/refresh', method: 'POST' }),
+      // setCredentials / clearCredentials are dispatched by baseQueryWithReauth
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
-          const { data } = await queryFulfilled;
-          dispatch(setCredentials({ user: data.data.user, accessToken: data.data.accessToken }));
-        } catch {
-          // Cookie expired / missing — clear everything including all caches.
-          dispatch(clearCredentials());
-          dispatch(todoApi.util.resetApiState());
-          dispatch(clipApi.util.resetApiState());
+          await queryFulfilled;
+        } catch (err) {
+          const status = (err as { error?: { status?: unknown } }).error?.status;
+          // Only a rejected refresh token ends the session. A network error or 5xx
+          // (e.g. the server is still waking up) keeps the user logged in.
+          if (status === 401 || status === 403) {
+            dispatch(todoApi.util.resetApiState());
+            dispatch(clipApi.util.resetApiState());
+            dispatch(chatApi.util.resetApiState());
+          }
         }
       },
     }),
@@ -104,6 +110,7 @@ export const authApi = createApi({
           dispatch(clearCredentials());
           dispatch(todoApi.util.resetApiState());
           dispatch(clipApi.util.resetApiState());
+          dispatch(chatApi.util.resetApiState());
         }
       },
     }),
