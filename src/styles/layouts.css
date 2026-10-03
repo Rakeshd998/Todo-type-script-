@@ -124,7 +124,7 @@
 
 .bento-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -158,8 +158,46 @@
   color: var(--text-muted);
 }
 
-.bento-stat--highlight .bento-stat-value {
+.bento-stat--accent .bento-stat-value {
   color: var(--primary);
+}
+
+.bento-stat--alert .bento-stat-value {
+  color: var(--priority-high);
+}
+
+.bento-stat--alert {
+  border-color: color-mix(in srgb, var(--priority-high) 40%, var(--container-border));
+}
+
+/* "3 of 8 done" progress */
+.bento-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bento-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bento-progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--todo-item-bg);
+  border: 1px solid var(--container-border);
+  overflow: hidden;
+}
+
+.bento-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: width 0.4s ease;
 }
 
 /* Tile tokens */
@@ -301,15 +339,27 @@ html[data-layout="bento"] {
   html[data-layout="bento"] .profile-page {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    /* Row 2 hugs the security tile; row 3 absorbs the tall appearance tile */
+    grid-template-rows: auto auto 1fr;
     gap: var(--bento-gap);
     align-items: stretch;
   }
 
-  html[data-layout="bento"] .profile-page > .profile-hero { grid-column: span 5; }
-  html[data-layout="bento"] .profile-page > .profile-section { grid-column: span 7; }
-  html[data-layout="bento"] .profile-page > .profile-section:nth-child(3) { grid-column: span 8; } /* Appearance */
+  /* Row 1: hero | account.  Rows 2–3: appearance (tall) | security, danger zone */
+  html[data-layout="bento"] .profile-page > .profile-hero { grid-column: 1 / span 5; }
+  html[data-layout="bento"] .profile-page > .profile-section--account { grid-column: 6 / -1; }
+  html[data-layout="bento"] .profile-page > .profile-section--appearance {
+    grid-column: 1 / span 8;
+    grid-row: 2 / span 2;
+  }
+  html[data-layout="bento"] .profile-page > .profile-section--security {
+    grid-column: 9 / -1;
+    grid-row: 2;
+    align-self: start;
+  }
   html[data-layout="bento"] .profile-page > .profile-danger-zone {
-    grid-column: span 4;
+    grid-column: 9 / -1;
+    grid-row: 3;
     align-self: start;
   }
 

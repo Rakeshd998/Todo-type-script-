@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { useUpdateTodoMutation, useDeleteTodoMutation } from '../store/api/todoApi';
-import type { Todo } from '../types/todo.types';
+import { useUpdateTodoMutation, useDeleteTodoMutation, type TodoFields } from '../store/api/todoApi';
+import { useAppDispatch } from '../store';
+import { showToast } from '../store/slices/toastSlice';
+import type { Todo, TodoPriority } from '../types/todo.types';
+import { formatDueDate, getDueStatus } from '../utils/dates';
+import PriorityPicker from './PriorityPicker';
 
 interface TodoItemProps {
   todo: Todo;
@@ -18,12 +22,19 @@ const formatDateTime = (dateStr: string): string => {
   });
 };
 
+const DUE_LABELS = { overdue: 'Overdue', today: 'Due today', tomorrow: 'Due tomorrow' } as const;
+
+const truncate = (text: string, max = 40) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
+
 const TodoItem = ({ todo }: TodoItemProps) => {
+  const dispatch = useAppDispatch();
   const [updateTodo, { isLoading: isUpdating }] = useUpdateTodoMutation();
   const [deleteTodo, { isLoading: isDeleting }] = useDeleteTodoMutation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
+  const [editDueDate, setEditDueDate] = useState(todo.dueDate ?? '');
+  const [editPriority, setEditPriority] = useState<TodoPriority>(todo.priority);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -38,55 +49,132 @@ const TodoItem = ({ todo }: TodoItemProps) => {
     updateTodo({ id: todo._id, completed: !todo.completed });
   };
 
-  const handleDelete = () => {
+  // Deleting moves the todo to the server's trash; the toast offers Undo
+  const handleDelete = async () => {
     if (isUpdating || isDeleting) return;
-    deleteTodo(todo._id);
+    const result = await deleteTodo(todo._id);
+    if ('error' in result) {
+      dispatch(showToast({ message: 'Could not delete the todo. Please try again.', tone: 'error' }));
+      return;
+    }
+    dispatch(
+      showToast({
+        message: `Deleted “${truncate(todo.text)}”`,
+        undo: { kind: 'restore-todo', todoId: todo._id },
+      }),
+    );
   };
 
   const handleEditStart = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isDeleting || isUpdating) return;
     setEditText(todo.text);
+    setEditDueDate(todo.dueDate ?? '');
+    setEditPriority(todo.priority);
     setIsEditing(true);
+  };
+
+  const handleEditCancel = () => {
+    setEditText(todo.text);
+    setIsEditing(false);
   };
 
   const handleEditSave = async () => {
     const trimmed = editText.trim();
     if (!trimmed) {
-      setEditText(todo.text);
-      setIsEditing(false);
+      handleEditCancel();
       return;
     }
-    if (trimmed !== todo.text) {
-      await updateTodo({ id: todo._id, text: trimmed });
+    // Send only what changed
+    const changes: TodoFields = {};
+    if (trimmed !== todo.text) changes.text = trimmed;
+    if ((editDueDate || null) !== todo.dueDate) changes.dueDate = editDueDate || null;
+    if (editPriority !== todo.priority) changes.priority = editPriority;
+
+    if (Object.keys(changes).length > 0) {
+      await updateTodo({ id: todo._id, ...changes });
     }
     setIsEditing(false);
   };
 
   const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') handleEditSave();
-    if (e.key === 'Escape') {
-      setEditText(todo.text);
-      setIsEditing(false);
-    }
+    if (e.key === 'Escape') handleEditCancel();
   };
+
+  // Clicking a non-focusable part of the editor (e.g. a priority label) briefly
+  // moves focus to <body>. Remember that a click inside the editor is in progress
+  // so that blur isn't mistaken for "left the editor".
+  const pointerInEditor = useRef(false);
+
+  const handleEditorMouseDown = () => {
+    pointerInEditor.current = true;
+    // Reset after the click completes (also if the pointer is released outside)
+    window.addEventListener('mouseup', () => setTimeout(() => { pointerInEditor.current = false; }, 0), { once: true });
+  };
+
+  // After a label click focus is left on <body>; return it to the text field so
+  // Enter still saves and clicking outside still triggers save-on-blur
+  const handleEditorClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(document.activeElement)) inputRef.current?.focus();
+  };
+
+  // Save when focus leaves the whole edit area, not when moving between its
+  // own fields (text -> date -> priority)
+  const handleEditBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (pointerInEditor.current) return;
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) handleEditSave();
+  };
+
+  const dueStatus = todo.dueDate ? getDueStatus(todo.dueDate) : null;
+  const showDueWarning = dueStatus !== null && !todo.completed;
 
   const wasEdited = todo.createdAt !== todo.updatedAt;
 
   return (
-    <div className={`todo-item ${todo.completed ? 'completed' : ''} ${isEditing ? 'todo-item--editing' : ''}`}>
+    <div
+      className={[
+        'todo-item',
+        todo.completed ? 'completed' : '',
+        isEditing ? 'todo-item--editing' : '',
+        `todo-item--priority-${todo.priority}`,
+        showDueWarning && dueStatus === 'overdue' ? 'todo-item--overdue' : '',
+      ].filter(Boolean).join(' ')}
+    >
       {isEditing ? (
         /* ── Edit Mode ── */
-        <div className="todo-edit-wrapper">
-          <input
-            ref={inputRef}
-            className="todo-edit-input"
-            value={editText}
-            onChange={(e) => setEditText(e.target.value)}
-            onKeyDown={handleEditKeyDown}
-            onBlur={handleEditSave}
-            maxLength={500}
-          />
+        <div
+          className="todo-edit-wrapper"
+          onBlur={handleEditBlur}
+          onMouseDown={handleEditorMouseDown}
+          onClick={handleEditorClick}
+        >
+          <div className="todo-edit-fields">
+            <input
+              ref={inputRef}
+              className="todo-edit-input"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              onKeyDown={handleEditKeyDown}
+              maxLength={500}
+              aria-label="Todo text"
+            />
+            <div className="todo-edit-options">
+              <input
+                type="date"
+                className="due-date-input due-date-input--boxed"
+                value={editDueDate}
+                onChange={(e) => setEditDueDate(e.target.value)}
+                onKeyDown={handleEditKeyDown}
+                aria-label="Due date"
+              />
+              <PriorityPicker
+                value={editPriority}
+                onChange={setEditPriority}
+                name={`priority-${todo._id}`}
+              />
+            </div>
+          </div>
           <div className="todo-edit-actions">
             <button
               className="todo-edit-save-btn"
@@ -104,7 +192,7 @@ const TodoItem = ({ todo }: TodoItemProps) => {
             </button>
             <button
               className="todo-edit-cancel-btn"
-              onClick={() => { setEditText(todo.text); setIsEditing(false); }}
+              onClick={handleEditCancel}
               aria-label="Cancel"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -130,6 +218,21 @@ const TodoItem = ({ todo }: TodoItemProps) => {
             <div className="todo-content">
               <span className="todo-text">{todo.text}</span>
               <div className="todo-meta">
+                {todo.dueDate && (
+                  <span
+                    className={`due-badge due-badge--${todo.completed ? 'done' : dueStatus}`}
+                    title={`Due ${formatDueDate(todo.dueDate)}`}
+                  >
+                    {showDueWarning && dueStatus !== 'upcoming'
+                      ? DUE_LABELS[dueStatus as keyof typeof DUE_LABELS]
+                      : `Due ${formatDueDate(todo.dueDate)}`}
+                  </span>
+                )}
+                {todo.priority !== 'medium' && (
+                  <span className={`priority-badge priority-badge--${todo.priority}`}>
+                    {todo.priority === 'high' ? 'High' : 'Low'}
+                  </span>
+                )}
                 <span className="todo-meta-item">
                   Created {formatDateTime(todo.createdAt)}
                 </span>

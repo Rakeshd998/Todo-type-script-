@@ -34,6 +34,10 @@ const authSlice = createSlice({
       // Persist so page refresh keeps the user logged in
       localStorage.setItem(TOKEN_KEY, action.payload.accessToken);
     },
+    // Update the profile without touching the session (e.g. after editing the name)
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+    },
     clearCredentials: (state) => {
       state.user = null;
       state.accessToken = null;
@@ -43,5 +47,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, clearCredentials } = authSlice.actions;
+export const { setCredentials, setUser, clearCredentials } = authSlice.actions;
 export default authSlice.reducer;

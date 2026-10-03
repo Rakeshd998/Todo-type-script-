@@ -4,6 +4,8 @@ import { useAppSelector } from '../store';
 import { useDeleteAccountMutation } from '../store/api/authApi';
 import AppShell from './AppShell';
 import AppearanceSettings from './AppearanceSettings';
+import EditNameField from './EditNameField';
+import ChangePasswordSection from './ChangePasswordSection';
 
 const ProfilePage = () => {
   const user = useAppSelector((s) => s.auth.user);
@@ -59,13 +61,10 @@ const ProfilePage = () => {
         </div>
 
         {/* Info Cards */}
-        <div className="profile-section">
+        <div className="profile-section profile-section--account">
           <h3 className="profile-section-title">Account Details</h3>
           <div className="profile-fields">
-            <div className="profile-field">
-              <span className="profile-field-label">Full Name</span>
-              <span className="profile-field-value">{user?.name || <em className="profile-empty-val">Not set</em>}</span>
-            </div>
+            <EditNameField />
             <div className="profile-field">
               <span className="profile-field-label">Email Address</span>
               <span className="profile-field-value">{user?.email}</span>
@@ -78,10 +77,12 @@ const ProfilePage = () => {
         </div>
 
         {/* Preferences */}
-        <div className="profile-section">
+        <div className="profile-section profile-section--appearance">
           <h3 className="profile-section-title">Appearance</h3>
           <AppearanceSettings />
         </div>
+
+        <ChangePasswordSection />
 
         {/* ── Danger Zone ── */}
         <div className="profile-section profile-danger-zone">

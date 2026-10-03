@@ -363,3 +363,76 @@
     box-shadow: none;
   }
 }
+
+/* ── Feature touches: chips, pickers, toast, profile cards ── */
+[data-style="tactile"] :is(
+  .due-chip, .priority-picker, .due-date-field, .due-date-input--boxed,
+  .security-row, .password-form, .bento-stat, .bento-progress-track,
+  .profile-inline-btn--boxed, .profile-edit-cancel
+) {
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius-sm);
+}
+
+[data-style="tactile"] .due-chip { font-family: var(--tac-mono); text-transform: uppercase; font-size: 0.72rem; }
+[data-style="tactile"] .due-chip--active,
+[data-style="tactile"] .due-chip--active:hover {
+  background: var(--tac-ink);
+  color: var(--tac-on-ink);
+}
+
+[data-style="tactile"] .priority-option--active {
+  background: var(--tac-ink);
+  color: var(--tac-on-ink);
+  box-shadow: none;
+}
+
+[data-style="tactile"] :is(.due-badge, .priority-badge) {
+  border-radius: 3px;
+  font-family: var(--tac-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+[data-style="tactile"] .due-badge--overdue {
+  background: var(--priority-high);
+  color: #ffffff;
+}
+
+[data-style="tactile"] .due-badge--today {
+  background: var(--tac-accent);
+  color: var(--tac-on-accent);
+}
+
+[data-style="tactile"] .bento-progress-fill {
+  background: var(--tac-accent);
+  border-right: 2px solid var(--tac-ink);
+}
+
+[data-style="tactile"] .profile-edit-save {
+  background: var(--tac-accent);
+  color: var(--tac-on-accent);
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius-sm);
+  box-shadow: var(--tac-shadow-sm);
+}
+
+[data-style="tactile"] .toast {
+  --toast-bg: var(--container-bg);
+  --toast-fg: var(--text-main);
+  --toast-action: var(--tac-on-accent);
+  border: 2.5px solid var(--tac-ink);
+  border-radius: var(--tac-radius);
+  box-shadow: var(--tac-shadow-md);
+}
+
+[data-style="tactile"] .toast-action {
+  background: var(--tac-accent);
+  border: 2px solid var(--tac-ink);
+  border-radius: var(--tac-radius-sm);
+  font-family: var(--tac-mono);
+}
+
+[data-style="tactile"] .toast-progress {
+  background: var(--tac-accent);
+}

@@ -1,0 +1,564 @@
+/* ══════════════════════════════════════════════════════════════
+   FEATURES — due dates & priority, due filters, undo toast,
+   profile editing & password change.
+   Built on the shared tokens, so Classic / Glass / Tactile and
+   light / dark all apply (style files add finishing touches).
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  --priority-low: #94a3b8;
+  --priority-medium: #f59e0b;
+  --priority-high: #ef4444;
+  --due-today: var(--primary);
+  --due-soon: #d97706;
+}
+
+[data-theme="dark"] {
+  --priority-low: #8b95a8;
+  --priority-medium: #fbbf24;
+  --priority-high: #f87171;
+  --due-soon: #fbbf24;
+}
+
+/* Native date pickers follow the theme (calendar icon visible in dark mode) */
+.due-date-input { color-scheme: light; }
+[data-theme="dark"] .due-date-input { color-scheme: dark; }
+
+/* ── Add form: input row + options row ── */
+.todo-form {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.todo-form-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.todo-form-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.due-date-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 4px 3px 10px;
+  border: 1px solid var(--container-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-muted);
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.due-date-field--set {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--container-border));
+}
+
+.due-date-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.due-date-label svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.due-date-input {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 3px 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.due-date-input--boxed {
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-main);
+  padding: 6px 8px;
+}
+
+.due-date-field:focus-within,
+.due-date-input--boxed:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.due-date-clear {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.due-date-clear:hover {
+  background: var(--container-border);
+  color: var(--text-main);
+}
+
+/* ── Priority picker (Low / Med / High) ── */
+.priority-picker {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--input-bg);
+  border: 1px solid var(--container-border);
+  border-radius: 8px;
+}
+
+.priority-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.priority-option:hover { color: var(--text-main); }
+
+.priority-option--active {
+  background: var(--tab-active-bg);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.priority-option:has(input:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.priority-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-option--low .priority-dot { background: var(--priority-low); }
+.priority-option--medium .priority-dot { background: var(--priority-medium); }
+.priority-option--high .priority-dot { background: var(--priority-high); }
+
+/* ── Todo item: badges + edit options ── */
+.todo-meta {
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  white-space: normal;
+  margin-top: 2px;
+}
+
+.due-badge,
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.due-badge--overdue {
+  background: color-mix(in srgb, var(--priority-high) 14%, transparent);
+  color: var(--priority-high);
+}
+
+.due-badge--today {
+  background: color-mix(in srgb, var(--due-today) 14%, transparent);
+  color: var(--due-today);
+}
+
+.due-badge--tomorrow {
+  background: color-mix(in srgb, var(--due-soon) 16%, transparent);
+  color: var(--due-soon);
+}
+
+.due-badge--upcoming,
+.due-badge--done {
+  background: var(--input-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--container-border);
+}
+
+.priority-badge--high {
+  color: var(--priority-high);
+  border: 1px solid color-mix(in srgb, var(--priority-high) 45%, transparent);
+}
+
+.priority-badge--low {
+  color: var(--text-muted);
+  border: 1px dashed var(--container-border);
+}
+
+.todo-item--overdue {
+  border-color: color-mix(in srgb, var(--priority-high) 40%, var(--container-border));
+}
+
+.todo-edit-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-edit-fields .todo-edit-input {
+  width: 100%;
+}
+
+.todo-edit-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.todo-edit-wrapper {
+  align-items: flex-start;
+}
+
+/* ── Due filter chips ── */
+.due-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.due-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--container-border);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.due-chip:hover {
+  color: var(--text-main);
+  border-color: var(--input-border);
+}
+
+.due-chip--alert {
+  color: var(--priority-high);
+  border-color: color-mix(in srgb, var(--priority-high) 40%, var(--container-border));
+}
+
+.due-chip--active,
+.due-chip--active:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.due-chip-count {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  font-size: 0.7rem;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ── Undo toast ── */
+:root {
+  --toast-bg: #1f2937;
+  --toast-fg: #f9fafb;
+  --toast-action: #93c5fd;
+}
+
+[data-theme="dark"] {
+  --toast-bg: #f1f5f9;
+  --toast-fg: #0f172a;
+  --toast-action: #2563eb;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(480px, calc(100vw - 32px));
+  padding: 10px 8px 10px 18px;
+  border-radius: 12px;
+  background: var(--toast-bg);
+  color: var(--toast-fg);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  animation: toast-in 0.25s ease-out;
+}
+
+.toast--error {
+  --toast-action: #fca5a5;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.toast-message {
+  font-size: 0.875rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toast-action {
+  flex-shrink: 0;
+  min-width: 56px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--toast-action);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-action:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--toast-action) 16%, transparent);
+}
+
+.toast-close {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-close:hover { opacity: 1; background: color-mix(in srgb, currentColor 12%, transparent); }
+
+.toast-close svg { width: 15px; height: 15px; }
+
+.toast-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--toast-action);
+  transform-origin: left;
+  animation: toast-countdown linear forwards;
+}
+
+@keyframes toast-countdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+  .toast-progress { display: none; }
+}
+
+@media (max-width: 600px) {
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    transform: none;
+    max-width: none;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ── Profile: inline name edit ── */
+.profile-field-value--with-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  word-break: normal;
+}
+
+.profile-inline-btn {
+  border: none;
+  background: transparent;
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.profile-inline-btn:hover {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.profile-inline-btn--boxed {
+  border: 1px solid var(--container-border);
+  background: var(--todo-item-bg);
+  padding: 8px 14px;
+}
+
+.profile-field--editing {
+  flex-wrap: wrap;
+}
+
+.profile-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 240px;
+}
+
+.profile-edit-input {
+  flex: 1;
+  max-width: 280px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+.profile-edit-save,
+.profile-edit-cancel {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 60px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-edit-save {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.profile-edit-cancel {
+  border: 1px solid var(--container-border);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.profile-field-error {
+  width: 100%;
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--danger);
+}
+
+/* ── Profile: security ── */
+.security-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--container-border);
+  border-radius: 12px;
+  background: var(--todo-item-bg);
+}
+
+.security-row-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.security-row-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--container-border);
+  border-radius: 12px;
+  background: var(--todo-item-bg);
+}
+
+.password-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.password-form-actions .auth-submit-btn {
+  margin-top: 0;
+  padding: 10px 18px;
+  min-height: 42px;
+}
+
+.profile-success {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--success);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
+}
+
+@media (max-width: 600px) {
+  .security-row { flex-direction: column; align-items: stretch; }
+  .profile-edit { min-width: 100%; justify-content: stretch; }
+  .profile-edit-input { max-width: none; }
+}

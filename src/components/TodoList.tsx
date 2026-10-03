@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useGetTodosQuery } from '../store/api/todoApi';
+import { useSearchParams } from 'react-router-dom';
+import { useGetTodosQuery, useGetTodoStatsQuery } from '../store/api/todoApi';
+import type { DueFilter } from '../types/todo.types';
+import { todayDateOnly } from '../utils/dates';
 import TodoItem from './TodoItem';
 
 const LIMIT = 5;
@@ -10,12 +13,41 @@ const getPageNumbers = (current: number, total: number): number[] => {
   return Array.from({ length: 5 }, (_, i) => start + i);
 };
 
+const DUE_FILTERS: { id: DueFilter | null; label: string }[] = [
+  { id: null, label: 'All' },
+  { id: 'overdue', label: 'Overdue' },
+  { id: 'today', label: 'Due today' },
+];
+
+const parseDue = (value: string | null): DueFilter | null =>
+  value === 'overdue' || value === 'today' ? value : null;
+
 const TodoList = () => {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [page, setPage] = useState(1);
+
+  // Due filter lives in the URL (#/?due=overdue) so other views can link to it
+  const [searchParams, setSearchParams] = useSearchParams();
+  const due = parseDue(searchParams.get('due'));
+  const today = todayDateOnly();
+
+  // The page number belongs to one due filter: switching filters (including via a
+  // link from elsewhere) starts at page 1 without an extra fetch of the old page
+  const [pageState, setPageState] = useState({ due, page: 1 });
+  const page = pageState.due === due ? pageState.page : 1;
+  const setPage = (next: number | ((current: number) => number)) =>
+    setPageState((prev) => {
+      const current = prev.due === due ? prev.page : 1;
+      return { due, page: typeof next === 'function' ? next(current) : next };
+    });
+
+  const changeDueFilter = (next: DueFilter | null) => {
+    setSearchParams(next ? { due: next } : {}, { replace: true });
+  };
+
+  const { data: stats } = useGetTodoStatsQuery({ today });
 
   // Toggle states for the icon buttons
   const [showSearch, setShowSearch] = useState(false);
@@ -25,7 +57,7 @@ const TodoList = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1);
+      setPageState((prev) => ({ ...prev, page: 1 }));
     }, 400);
     return () => clearTimeout(timer);
   }, [search]);
@@ -56,6 +88,7 @@ const TodoList = () => {
     ...(debouncedSearch && { search: debouncedSearch }),
     ...(startDate && { startDate }),
     ...(endDate && { endDate }),
+    ...(due && { due, today }),
   };
 
   const { data, isLoading, isError, isFetching } = useGetTodosQuery(queryParams);
@@ -80,7 +113,7 @@ const TodoList = () => {
         <span className="result-count">
           {isFetching && <span className="fetching-dot" />}
           {data
-            ? `${data.total} ${data.total === 1 ? 'todo' : 'todos'}${debouncedSearch || hasDateFilter ? ' found' : ''}`
+            ? `${data.total} ${due === 'overdue' ? 'overdue' : due === 'today' ? 'due today' : data.total === 1 ? 'todo' : 'todos'}${debouncedSearch || hasDateFilter ? ' found' : ''}`
             : !isLoading && !isError
             ? '0 todos'
             : ''}
@@ -115,6 +148,30 @@ const TodoList = () => {
             </svg>
           </button>
         </div>
+      </div>
+
+      {/* ── Due-date filter chips ── */}
+      <div className="due-filter" role="group" aria-label="Filter by due date">
+        {DUE_FILTERS.map((filter) => {
+          const count =
+            filter.id === 'overdue' ? stats?.overdue : filter.id === 'today' ? stats?.dueToday : undefined;
+          return (
+            <button
+              key={filter.label}
+              type="button"
+              className={[
+                'due-chip',
+                due === filter.id ? 'due-chip--active' : '',
+                filter.id === 'overdue' && count ? 'due-chip--alert' : '',
+              ].filter(Boolean).join(' ')}
+              aria-pressed={due === filter.id}
+              onClick={() => changeDueFilter(filter.id)}
+            >
+              {filter.label}
+              {count !== undefined && count > 0 && <span className="due-chip-count">{count}</span>}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── Expandable search panel ── */}
@@ -190,7 +247,15 @@ const TodoList = () => {
             <path d="M9 11l3 3L22 4" />
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
           </svg>
-          <p>{debouncedSearch || hasDateFilter ? 'No todos match your filters.' : "You're all caught up!"}</p>
+          <p>
+            {due === 'overdue' && !debouncedSearch && !hasDateFilter
+              ? 'Nothing overdue. Nice work!'
+              : due === 'today' && !debouncedSearch && !hasDateFilter
+              ? 'Nothing due today.'
+              : debouncedSearch || hasDateFilter || due
+              ? 'No todos match your filters.'
+              : "You're all caught up!"}
+          </p>
         </div>
       ) : (
         <>

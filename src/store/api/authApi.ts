@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from './baseQuery';
-import { setCredentials, clearCredentials } from '../slices/authSlice';
+import { setCredentials, setUser, clearCredentials } from '../slices/authSlice';
 import { todoApi } from './todoApi';
 import { clipApi } from './clipApi';
 import { chatApi } from './chatApi';
@@ -10,6 +10,9 @@ import type {
   RegisterRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  UpdateProfileRequest,
+  ChangePasswordRequest,
+  User,
   ApiResponse,
 } from '../../types/auth.types';
 
@@ -106,11 +109,39 @@ export const authApi = createApi({
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-        } finally {
+          // Only sign out once the account is really gone — on failure the
+          // Profile page shows the error and the user stays logged in
           dispatch(clearCredentials());
           dispatch(todoApi.util.resetApiState());
           dispatch(clipApi.util.resetApiState());
           dispatch(chatApi.util.resetApiState());
+        } catch {
+          // error handled by component
+        }
+      },
+    }),
+
+    updateProfile: builder.mutation<ApiResponse<{ user: User }>, UpdateProfileRequest>({
+      query: (body) => ({ url: '/auth/me', method: 'PATCH', body }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data.data.user));
+        } catch {
+          // error handled by component
+        }
+      },
+    }),
+
+    // Other devices are signed out; this session receives fresh tokens
+    changePassword: builder.mutation<ApiResponse<AuthResponse>, ChangePasswordRequest>({
+      query: (body) => ({ url: '/auth/change-password', method: 'POST', body }),
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials({ user: data.data.user, accessToken: data.data.accessToken }));
+        } catch {
+          // error handled by component
         }
       },
     }),
@@ -125,4 +156,6 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useDeleteAccountMutation,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
 } = authApi;

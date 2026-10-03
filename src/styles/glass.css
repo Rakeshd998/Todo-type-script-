@@ -255,3 +255,19 @@
     box-shadow: none;
   }
 }
+
+/* ── Feature touches: chips, toast, progress ── */
+[data-style="glass"] .due-chip--active,
+[data-style="glass"] .bento-progress-fill {
+  background: var(--glass-accent);
+  border-color: transparent;
+}
+
+[data-style="glass"] .toast {
+  --toast-bg: rgba(17, 20, 42, 0.72);
+  --toast-fg: #f1f3ff;
+  --toast-action: #a5b4fc;
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}

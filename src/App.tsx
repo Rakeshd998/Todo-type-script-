@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 // After App.css so style/layout overrides win at equal specificity
+import './styles/features.css';
 import './styles/layouts.css';
 import './styles/glass.css';
 import './styles/tactile.css';

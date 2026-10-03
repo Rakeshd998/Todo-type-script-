@@ -5,6 +5,7 @@ import { useLogoutMutation } from '../store/api/authApi';
 import { useTheme } from '../hooks/useTheme';
 import GripLogo from './GripLogo';
 import Footer from './Footer';
+import Toast from './Toast';
 
 const tabClass = ({ isActive }: { isActive: boolean }) =>
   `page-tab ${isActive ? 'page-tab--active' : ''}`;
@@ -108,6 +109,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
       <main className="page-content">{children}</main>
 
       <Footer />
+      <Toast />
     </div>
   );
 };
