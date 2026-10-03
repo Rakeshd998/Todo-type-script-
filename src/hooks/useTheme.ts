@@ -2,10 +2,10 @@ import { createContext, useContext } from 'react';
 
 export type Theme = 'light' | 'dark';
 export type UiStyle = 'classic' | 'glass' | 'tactile';
-export type UiLayout = 'focused' | 'wide' | 'sidebar';
+export type UiLayout = 'focused' | 'wide' | 'sidebar' | 'bento';
 
 export const UI_STYLES: UiStyle[] = ['classic', 'glass', 'tactile'];
-export const UI_LAYOUTS: UiLayout[] = ['focused', 'wide', 'sidebar'];
+export const UI_LAYOUTS: UiLayout[] = ['focused', 'wide', 'sidebar', 'bento'];
 
 export interface AppearanceContextValue {
   theme: Theme;

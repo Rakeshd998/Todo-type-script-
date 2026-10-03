@@ -22,7 +22,7 @@
           var s = localStorage.getItem('uiStyle');
           if (s === 'glass' || s === 'tactile') style = s;
           var l = localStorage.getItem('uiLayout');
-          if (l === 'wide' || l === 'sidebar') layout = l;
+          if (l === 'wide' || l === 'sidebar' || l === 'bento') layout = l;
         } catch (e) {}
         d.setAttribute('data-theme', theme);
         d.setAttribute('data-style', style);

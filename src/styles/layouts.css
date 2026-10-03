@@ -83,3 +83,264 @@
     align-items: start;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BENTO — every region becomes its own tile on a 12-column grid.
+   The outer card disappears; tiles inherit the active style through
+   the --bento-* tokens (Glass and Tactile override them below).
+   ══════════════════════════════════════════════════════════════ */
+
+/* Overview tile (rendered on the Todos page in bento mode) — also used as a
+   plain card when the screen is too narrow for the grid */
+.bento-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--container-border);
+  border-radius: 14px;
+}
+
+.bento-overview-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bento-overview-date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.bento-overview-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.bento-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bento-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--todo-item-bg);
+  border: 1px solid var(--container-border);
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.bento-stat:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.bento-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.bento-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bento-stat--highlight .bento-stat-value {
+  color: var(--primary);
+}
+
+/* Tile tokens */
+html[data-layout="bento"] {
+  --bento-gap: 16px;
+  --bento-radius: 20px;
+  --bento-border: 1px solid var(--container-border);
+  --bento-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.12);
+  --bento-backdrop: none;
+}
+
+[data-style="glass"][data-layout="bento"] {
+  --bento-radius: 24px;
+  --bento-shadow: var(--glass-shadow);
+  --bento-backdrop: var(--glass-blur);
+}
+
+[data-style="tactile"][data-layout="bento"] {
+  --bento-gap: 20px;
+  --bento-radius: var(--tac-radius);
+  --bento-border: 2.5px solid var(--tac-ink);
+  --bento-shadow: var(--tac-shadow-md);
+}
+
+@media (min-width: 960px) {
+  /* Outer card dissolves into a grid (html prefix outranks style rules) */
+  html[data-layout="bento"] .app-container {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--bento-gap);
+    align-content: start;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* ── Tile surface ── */
+  html[data-layout="bento"] :is(
+    .app-header, .page-tabs, .app-footer, .bento-overview, .todo-form, .todo-list-wrapper,
+    .clip-page-header, .clip-card, .profile-hero, .profile-section, .chat-sidebar, .chat-main
+  ) {
+    background: var(--container-bg);
+    border: var(--bento-border);
+    border-radius: var(--bento-radius);
+    box-shadow: var(--bento-shadow);
+    -webkit-backdrop-filter: var(--bento-backdrop);
+    backdrop-filter: var(--bento-backdrop);
+  }
+
+  /* Tiles with their own content padding */
+  html[data-layout="bento"] :is(
+    .bento-overview, .todo-form, .todo-list-wrapper, .profile-hero, .profile-section
+  ) {
+    padding: 22px;
+  }
+
+  /* ── Row 1: header tile + 2×2 navigation tile ── */
+  html[data-layout="bento"] .app-header {
+    grid-column: span 8;
+    margin: 0;
+    padding: 18px 24px;
+  }
+
+  html[data-layout="bento"] .page-tabs {
+    grid-column: span 4;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  html[data-layout="bento"] .page-content {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--bento-gap);
+    align-items: start;
+  }
+
+  html[data-layout="bento"] .page-content > * {
+    grid-column: 1 / -1;
+  }
+
+  html[data-layout="bento"] .app-footer {
+    grid-column: 1 / -1;
+    padding: 12px;
+    opacity: 1;
+  }
+
+  /* ── Todos: big list tile, quick-add + overview stacked beside it ── */
+  /* Row 1 hugs the quick-add tile; row 2 takes the rest of the list's height,
+     so the overview tile sits directly under quick-add (no stretched gap) */
+  html[data-layout="bento"] .page-content:has(> .bento-overview) {
+    grid-template-rows: auto 1fr;
+  }
+
+  html[data-layout="bento"] .page-content > .todo-list-wrapper {
+    grid-column: 1 / span 8;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+  }
+
+  html[data-layout="bento"] .page-content > .todo-form {
+    grid-column: 9 / -1;
+    grid-row: 1;
+  }
+
+  html[data-layout="bento"] .page-content > .bento-overview {
+    grid-column: 9 / -1;
+    grid-row: 2;
+  }
+
+  /* ── Clips: header tile, then cards as tiles with a featured span ── */
+  html[data-layout="bento"] .clip-page-header {
+    padding: 14px 18px;
+  }
+
+  html[data-layout="bento"] .clip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--bento-gap);
+    align-items: start;
+  }
+
+  html[data-layout="bento"] .clip-card:nth-child(4n + 1) {
+    grid-column: span 2;
+  }
+
+  html[data-layout="bento"] .clip-page {
+    gap: var(--bento-gap);
+  }
+
+  /* ── Profile: hero | details, appearance | danger zone ── */
+  html[data-layout="bento"] .profile-page {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--bento-gap);
+    align-items: stretch;
+  }
+
+  html[data-layout="bento"] .profile-page > .profile-hero { grid-column: span 5; }
+  html[data-layout="bento"] .profile-page > .profile-section { grid-column: span 7; }
+  html[data-layout="bento"] .profile-page > .profile-section:nth-child(3) { grid-column: span 8; } /* Appearance */
+  html[data-layout="bento"] .profile-page > .profile-danger-zone {
+    grid-column: span 4;
+    align-self: start;
+  }
+
+  html[data-layout="bento"] .profile-hero {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  html[data-layout="bento"] .profile-hero-info {
+    align-items: center;
+  }
+
+  /* ── Chat: contacts and conversation as two separate tiles ── */
+  html[data-layout="bento"] .chat-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: var(--bento-gap);
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  html[data-layout="bento"] :is(.chat-sidebar, .chat-main) {
+    width: auto;
+    overflow: hidden;
+  }
+
+  html[data-layout="bento"] .chat-sidebar {
+    border-right: var(--bento-border);
+  }
+}

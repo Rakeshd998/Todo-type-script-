@@ -11,6 +11,7 @@ const LAYOUT_OPTIONS: { id: UiLayout; name: string; description: string }[] = [
   { id: 'focused', name: 'Focused', description: 'Single centred column' },
   { id: 'wide', name: 'Wide', description: 'More room, clips in a grid' },
   { id: 'sidebar', name: 'Sidebar', description: 'Navigation on the left' },
+  { id: 'bento', name: 'Bento', description: 'Dashboard of tiles' },
 ];
 
 const MODE_OPTIONS: { id: Theme; name: string }[] = [
@@ -30,8 +31,16 @@ const CheckIcon = () => (
 const LayoutPreview = ({ layout }: { layout: UiLayout }) => (
   <span className={`layout-preview layout-preview--${layout}`} aria-hidden="true">
     <span className="layout-preview-frame">
-      <span className="layout-preview-header" />
-      {layout === 'sidebar' ? (
+      {layout !== 'bento' && <span className="layout-preview-header" />}
+      {layout === 'bento' ? (
+        <span className="layout-preview-bento">
+          <span className="layout-preview-tile layout-preview-tile--wide" />
+          <span className="layout-preview-tile layout-preview-tile--accent" />
+          <span className="layout-preview-tile layout-preview-tile--tall" />
+          <span className="layout-preview-tile" />
+          <span className="layout-preview-tile" />
+        </span>
+      ) : layout === 'sidebar' ? (
         <span className="layout-preview-body">
           <span className="layout-preview-nav layout-preview-nav--vertical" />
           <span className="layout-preview-content" />

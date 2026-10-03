@@ -2987,3 +2987,34 @@
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+
+/* Bento wireframe */
+.layout-preview--bento .layout-preview-frame {
+  width: 92%;
+  border: none;
+  padding: 0;
+}
+
+.layout-preview-bento {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 4px;
+}
+
+.layout-preview-tile {
+  border: 1.5px solid currentColor;
+  border-radius: 4px;
+  opacity: 0.55;
+}
+
+.layout-preview-tile--accent {
+  background: var(--primary);
+  border-color: var(--primary);
+  opacity: 0.8;
+}
+
+.layout-preview-tile--tall {
+  grid-row: span 2;
+}
